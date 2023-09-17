@@ -9,6 +9,7 @@ const textminutes = document.querySelector('[data-minutes]');
 const textseconds = document.querySelector('[data-seconds]');
 let timeDifference = 0;
 let timerId = 0;
+let formatedDate = null;
 startBtn.setAttribute('disabled', 'disabled');
 
 const options = {
