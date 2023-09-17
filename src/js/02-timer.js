@@ -7,6 +7,8 @@ const textdays = document.querySelector('[data-days]');
 const texthours = document.querySelector('[data-hours]');
 const textminutes = document.querySelector('[data-minutes]');
 const textseconds = document.querySelector('[data-seconds]');
+let timeDifference = 0;
+let timerId = 0;
 startBtn.setAttribute('disabled', 'disabled');
 
 const options = {
@@ -15,18 +17,40 @@ const options = {
   defaultDate: new Date(),
   minuteIncrement: 1,
     onClose(selectedDates) {
-        const date = new Date();
-    if (selectedDates[0].getTime() < date.getTime()) {
-        window.alert("Please choose a date in the future")
-    } else {
-        startBtn.removeAttribute('disabled');
-        const ms = selectedDates[0].getTime() - date.getTime();
-        return convertMs(ms);
-    }
+        console.log(selectedDates[0]);
+        userDate(selectedDates[0]);
   },
 };
 
 flatpickr(input, options);
+
+function userDate(selectedDates) {
+    const date = new Date();
+    if (selectedDates < date) {
+        window.alert("Please choose a date in the future");
+    } else {
+        timeDifference = selectedDates.getTime() - date.getTime();
+        startBtn.removeAttribute('disabled');
+        formatedDate = convertMs(timeDifference);
+        visualTimerDate(formatedDate);
+    }
+}
+
+startBtn.addEventListener('click', onBtnStart);
+function onBtnStart() {
+    timerId = setInterval(startTimer, 1000);
+}
+
+function startTimer() {
+    timeDifference -= 1000;
+
+    if (textseconds.textContent <= 0 && textminutes.textContent <= 0) {
+        clearInterval(timerId);
+    } else {
+        formatedDate = convertMs(timeDifference);
+        visualTimerDate(formatedDate);
+    }
+}
 
 function convertMs (ms) {
   // Number of milliseconds per unit of time
@@ -48,8 +72,16 @@ function convertMs (ms) {
     const seconds = Math.floor((((ms % day) % hour) % minute) / second);
     // console.log(seconds);
 
-return { days, hours, minutes, seconds };
+    return { days, hours, minutes, seconds };
 }
 
-// startBtn.addEventListener('click', () => {
-// });
+function addLeadingZero(value) {
+    return String(value).padStart(2, '0')
+};
+
+function visualTimerDate (formatedDate) {
+    textdays.textContent = addLeadingZero(formatedDate.days);
+    texthours.textContent = addLeadingZero(formatedDate.hours);
+    textminutes.textContent = addLeadingZero(formatedDate.minutes);
+    textseconds.textContent = addLeadingZero(formatedDate.seconds);
+}
